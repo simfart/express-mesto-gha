@@ -4,7 +4,7 @@ const errors = require('../utils/errorCard');
 const getCard = (req, res) => {
   Card.find({})
     .populate(['owner', 'likes'])
-    .then((cards) => res.status(201).send({ data: cards }))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch((e) => errors(e, res));
 };
 

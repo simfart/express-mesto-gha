@@ -7,9 +7,6 @@ const errors = (err, res, errMessage, errNotFound, errIncorrectId) => {
   if (err.name === 'ValidationError') {
     return res.status(ERROR_CODE).send({ message: errMessage });
   }
-  // if (err.message === 'Not found' || err.message.includes('Cast to ObjectId failed')) {
-  //   return res.status(NOT_FOUND).send({ message: errMessageNotFound });
-  // }
   if (err.message === 'Not found') {
     return res.status(NOT_FOUND).send({ message: errNotFound });
   }

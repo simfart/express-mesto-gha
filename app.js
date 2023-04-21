@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { usersRoutes, cardsRoutes } = require('./routes');
+const { usersRoutes, cardsRoutes, errorNotFoundRout } = require('./routes');
 
 const { PORT = 3000 } = process.env;
 
@@ -21,5 +21,6 @@ app.use((req, res, next) => {
 
 app.use(usersRoutes);
 app.use(cardsRoutes);
+app.use(errorNotFoundRout);
 
 app.listen(PORT);
