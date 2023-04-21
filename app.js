@@ -22,6 +22,4 @@ app.use((req, res, next) => {
 app.use(usersRoutes);
 app.use(cardsRoutes);
 
-app.listen(PORT, () => {
-  console.log('Ссылка на сервер: ', PORT);
-});
+app.listen(PORT);
