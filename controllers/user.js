@@ -1,5 +1,8 @@
+const mongoose = require('mongoose');
 const User = require('../models/user');
 const errors = require('../utils/errorUser');
+
+const { DocumentNotFoundError } = mongoose.Error;
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -21,39 +24,38 @@ const getUsers = (req, res) => {
 const getUser = (req, res) => {
   User
     .findById(req.params.userId)
-    .orFail(new Error('Not found'))
+    .orFail(new DocumentNotFoundError())
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((e) => errors(e, res));
+    .catch((e) => {
+      errors(e, res);
+    });
 };
 
-const updateName = (req, res) => {
-  const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, {
+const updateUser = (req, res, data) => {
+  User.findByIdAndUpdate(req.user._id, data, {
     new: true, // обработчик then получит на вход обновлённую запись
     runValidators: true, // данные будут валидированы перед изменением
   })
-    .orFail(new Error('Not found'))
-    .then((user) => res.send({ data: user }))
+    .orFail(new DocumentNotFoundError())
+    .then((user) => {
+      res.send({ data: user });
+    })
     .catch((e) => {
       const errMassege = 'Переданы некорректные данные при обновлении профиля.';
       errors(e, res, errMassege);
     });
 };
 
+const updateName = (req, res) => {
+  const { name, about } = req.body;
+  updateUser(req, res, { name, about });
+};
+
 const updateAvatar = (req, res) => {
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, {
-    new: true, // обработчик then получит на вход обновлённую запись
-    runValidators: true, // данные будут валидированы перед изменением
-  })
-    .orFail(new Error('Not found'))
-    .then((user) => res.send({ data: user }))
-    .catch((e) => {
-      const errMassege = 'Переданы некорректные данные при обновлении аватара';
-      errors(e, res, errMassege);
-    });
+  const avatar = req.body;
+  updateUser(req, res, avatar);
 };
 
 module.exports = {

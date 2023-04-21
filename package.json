@@ -8,7 +8,7 @@
     "dev": "nodemon app.js",
     "lint": "npx eslint ."
   },
-  "author": "",
+  "author": "Lubov Artyugina",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
@@ -19,8 +19,6 @@
     "eslint": "^8.38.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
-    "install": "^0.13.0",
-    "nodemon": "^2.0.22",
-    "npm": "^9.6.4"
-  }
+    "nodemon": "^2.0.22"
+}
 }

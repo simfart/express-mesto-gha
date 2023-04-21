@@ -1,5 +1,8 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 const errors = require('../utils/errorCard');
+
+const { DocumentNotFoundError } = mongoose.Error;
 
 const getCard = (req, res) => {
   Card.find({})
@@ -22,38 +25,35 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .orFail(new Error('Not found'))
+    .orFail(new DocumentNotFoundError())
     .then((card) => res.send({ data: card }))
+    .catch((e) => errors(e, res));
+};
+const likeDeleteCard = (req, res, keyMethod) => {
+  Card
+    .findByIdAndUpdate(
+      req.params.cardId,
+      keyMethod,
+      { new: true },
+    )
+    .orFail(new DocumentNotFoundError())
+    .then((card) => card.populate(['owner', 'likes']))
+    .then((card) => {
+      res.send({ data: card });
+    })
     .catch((e) => errors(e, res));
 };
 
 const likeCard = (req, res) => {
-  Card
-    .findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-      { new: true },
-    )
-    .orFail(new Error('Not found'))
-    .then((card) => card.populate(['owner', 'likes']))
-    .then((card) => {
-      res.send({ data: card });
-    })
-    .catch((e) => errors(e, res));
+  // добавить _id в массив, если его там нет
+  const keyMethod = { $addToSet: { likes: req.user._id } };
+  likeDeleteCard(req, res, keyMethod);
 };
 
 const dislikeCard = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
-  )
-    .orFail(new Error('Not found'))
-    .then((card) => card.populate(['owner', 'likes']))
-    .then((card) => {
-      res.send({ data: card });
-    })
-    .catch((e) => errors(e, res));
+  // убрать _id из массива
+  const keyMethod = { $pull: { likes: req.user._id } };
+  likeDeleteCard(req, res, keyMethod);
 };
 
 module.exports = {

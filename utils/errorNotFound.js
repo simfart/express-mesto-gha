@@ -1,5 +1,7 @@
+const NOT_FOUND = 404;
+
 const errorNotFound = (req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+  res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
 };
 
 module.exports = errorNotFound;
