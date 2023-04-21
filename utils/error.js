@@ -1,7 +1,7 @@
 const ERROR_CODE = 400;
 const NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
-const messageError = 'Произошла ошибка';
+const messageError = 'На сервере произошла ошибка';
 
 const errors = (err, res, errMessage, errNotFound, errIncorrectId) => {
   if (err.name === 'ValidationError') {
