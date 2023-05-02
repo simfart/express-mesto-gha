@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const JWT = require('jsonwebtoken');
 const User = require('../models/user');
-const { generateToken } = require('../utils/token');
+
+const SECRET_KEY = 'SECRET';
 
 const { DocumentNotFoundError } = mongoose.Error;
 
@@ -14,7 +16,6 @@ const getUsers = (req, res, next) => {
 };
 
 const getUsersMe = (req, res, next) => {
-  console.log(req.user);
   User
     .findById(req.user._id)
     .then((user) => {
@@ -82,7 +83,7 @@ const login = (req, res, next) => {
     .then((user) => {
       // создадим токен
       const payload = { _id: user.id, email: user.email };
-      const token = generateToken(payload);
+      const token = JWT.sign(payload, SECRET_KEY, { expiresIn: '7d' });
       // вернём токен
       res
         .cookie('jwt', token, {

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 const { DocumentNotFoundError } = mongoose.Error;
+const { AccessError } = require('../utils/errors/errorModule');
 
 const getCard = (req, res, next) => {
   Card.find({})
@@ -26,7 +27,7 @@ const deleteCard = (req, res, next) => {
         return next(new DocumentNotFoundError('Карточка с указанным _id не найдена'));
       }
       if (card.owner.toString() !== req.user._id) {
-        return next(new DocumentNotFoundError('Доступ запрещен'));
+        return next(new AccessError());
       }
       return Card.findByIdAndDelete(req.params.cardId)
         .then(() => res.send({ data: card }));
