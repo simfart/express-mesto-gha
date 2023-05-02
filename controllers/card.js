@@ -21,13 +21,15 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
-    .orFail(new DocumentNotFoundError('Карточка с указанным _id не найдена'))
     .then((card) => {
-      if (card.owner.toString() !== req.user._id) {
-        next(new DocumentNotFoundError('Доступ запрещен'));
+      if (!card) {
+        return next(new DocumentNotFoundError('Карточка с указанным _id не найдена'));
       }
-      Card.findByIdAndRemove(req.params.cardId);
-      res.send({ data: card });
+      if (card.owner.toString() !== req.user._id) {
+        return next(new DocumentNotFoundError('Доступ запрещен'));
+      }
+      return Card.findByIdAndDelete(req.params.cardId)
+        .then(() => res.send({ data: card }));
     })
     .catch((err) => {
       next(err);

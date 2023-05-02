@@ -2,11 +2,10 @@ const router = require('express').Router();
 const {
   getUserId, getUsersMe, getUsers, updateName, updateAvatar,
 } = require('../controllers/user');
-const { errUpdateName, errUpdateAvatar } = require('../middlewares/error-celebrate');
+const { errUserdId, errUpdateName, errUpdateAvatar } = require('../middlewares/error-celebrate');
 
 router.get('/', getUsers);
-router.get('/:userId', getUserId);
-// router.post('/', createUser);
+router.get('/:userId', errUserdId, getUserId);
 router.patch('/me', errUpdateName, updateName);
 router.patch('/me/avatar', errUpdateAvatar, updateAvatar);
 router.get('/me', getUsersMe);

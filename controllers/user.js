@@ -72,12 +72,10 @@ const createUser = (req, res, next) => {
       password: hash, // записываем хеш в базу
     }))
     .then((user) => res.status(201).send({ data: user }))
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -93,12 +91,7 @@ const login = (req, res) => {
         });
       res.status(200).send({ token });
     })
-    .catch((err) => {
-      // ошибка аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch((err) => next(err));
 };
 
 module.exports = {
