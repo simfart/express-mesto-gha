@@ -14,6 +14,7 @@ const getUsers = (req, res, next) => {
 };
 
 const getUsersMe = (req, res, next) => {
+  console.log(req.user);
   User
     .findById(req.user._id)
     .then((user) => {
