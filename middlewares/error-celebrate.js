@@ -1,5 +1,4 @@
 const { celebrate, Joi } = require('celebrate');
-// eslint-disable-next-line import/no-extraneous-dependencies
 Joi.objectId = require('joi-objectid')(Joi);
 
 const errCreateUser = celebrate({
