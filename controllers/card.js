@@ -1,14 +1,12 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 
-const { DocumentNotFoundError } = mongoose.Error;
-const { AccessError } = require('../utils/errors/errorModule');
+const { AccessError, NotFoundError } = require('../utils/errors');
 
 const getCard = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 const createCard = (req, res, next) => {
@@ -17,14 +15,14 @@ const createCard = (req, res, next) => {
 
   Card.create({ name, link, owner })
     .then((card) => res.status(201).send({ data: card }))
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        return next(new DocumentNotFoundError('Карточка с указанным _id не найдена'));
+        return next(new NotFoundError('Карточка с указанным _id не найдена'));
       }
       if (card.owner.toString() !== req.user._id) {
         return next(new AccessError());
@@ -32,9 +30,7 @@ const deleteCard = (req, res, next) => {
       return Card.findByIdAndDelete(req.params.cardId)
         .then(() => res.send({ data: card }));
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 const likeDeleteCard = (req, res, next, keyMethod) => {
   Card
@@ -43,12 +39,11 @@ const likeDeleteCard = (req, res, next, keyMethod) => {
       keyMethod,
       { new: true },
     )
-    .orFail(new DocumentNotFoundError('Карточка с указанным _id не найдена'))
-    .then((card) => card.populate(['owner', 'likes']))
+    .orFail(new NotFoundError('Карточка с указанным _id не найдена'))
     .then((card) => {
       res.send({ data: card });
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 const likeCard = (req, res, next) => {

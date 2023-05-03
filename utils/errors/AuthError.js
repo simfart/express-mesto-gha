@@ -1,7 +1,7 @@
 class AuthError extends Error {
-  constructor() {
-    super();
-    this.message = 'Неправильные почта или пароль';
+  constructor(message) {
+    super(message);
+    // this.message = 'Неправильные почта или пароль';
     this.statusCode = 401;
   }
 }

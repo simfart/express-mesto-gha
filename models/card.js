@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const urlrRegex = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -11,10 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (value) => {
-        const urlrRegex = /^(https?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/;
-        return urlrRegex.test(value);
-      },
+      validator: (value) => urlrRegex.test(value),
       message: 'Невалидный URL',
     },
   },

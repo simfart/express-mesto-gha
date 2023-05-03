@@ -1,18 +1,15 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');
 const User = require('../models/user');
 
 const SECRET_KEY = 'SECRET';
 
-const { DocumentNotFoundError } = mongoose.Error;
+const { NotFoundError, DuplicateKeyError } = require('../utils/errors');
 
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const getUsersMe = (req, res, next) => {
@@ -20,22 +17,22 @@ const getUsersMe = (req, res, next) => {
     .findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new DocumentNotFoundError('Нет пользователя с таким id'));
+        next(new NotFoundError('Нет пользователя с таким id'));
       }
       res.send({ data: user });
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 const getUserId = (req, res, next) => {
   const { userId } = req.params;
   User
     .findById(userId)
-    .orFail(new DocumentNotFoundError('Нет пользователя с таким id'))
+    .orFail(new NotFoundError('Нет пользователя с таким id'))
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 const updateUser = (req, res, next, data) => {
@@ -43,11 +40,11 @@ const updateUser = (req, res, next, data) => {
     new: true, // обработчик then получит на вход обновлённую запись
     runValidators: true, // данные будут валидированы перед изменением
   })
-    .orFail(new DocumentNotFoundError('Нет пользователя с таким id'))
+    .orFail(new NotFoundError('Нет пользователя с таким id'))
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 const updateName = (req, res, next) => {
@@ -74,7 +71,11 @@ const createUser = (req, res, next) => {
       password: hash, // записываем хеш в базу
     }))
     .then((user) => res.status(201).send({ data: user }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new DuplicateKeyError());
+      }
+    });
 };
 
 const login = (req, res, next) => {
@@ -91,9 +92,9 @@ const login = (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
         });
-      res.status(200).send({ token });
+      res.send({ token });
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 module.exports = {

@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const usersRoutes = require('./users');
 const cardsRoutes = require('./cards');
-const errorNotFound = require('../utils/errors/NotFoundError');
+const notFound = require('../controllers/notFound');
 const { createUser, login } = require('../controllers/user');
 const auth = require('../middlewares/auth');
 const { errCreateUser, errLogin } = require('../middlewares/error-celebrate');
@@ -12,6 +12,6 @@ router.post('/signup', errCreateUser, createUser);
 
 router.use('/users', auth, usersRoutes);
 router.use('/cards', auth, cardsRoutes);
-router.use('*', errorNotFound);
+router.use('*', auth, notFound);
 
 module.exports = router;
