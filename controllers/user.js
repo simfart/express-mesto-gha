@@ -4,7 +4,7 @@ const User = require('../models/user');
 
 const SECRET_KEY = 'SECRET';
 
-const { NotFoundError, DuplicateKeyError } = require('../utils/errors');
+const { NotFoundError, DuplicateKeyError, ValidationError } = require('../utils/errors');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -44,7 +44,13 @@ const updateUser = (req, res, next, data) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные при обновлении профиля. '));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const updateName = (req, res, next) => {
@@ -72,8 +78,12 @@ const createUser = (req, res, next) => {
     }))
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
-      if (err.code === 11000) {
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные при создании пользователя. '));
+      } else if (err.code === 11000) {
         next(new DuplicateKeyError());
+      } else {
+        next(err);
       }
     });
 };
@@ -97,6 +107,10 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const logout = (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Выход' });
+};
+
 module.exports = {
   createUser,
   getUserId,
@@ -105,4 +119,5 @@ module.exports = {
   updateAvatar,
   login,
   getUsersMe,
+  logout,
 };
