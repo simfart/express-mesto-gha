@@ -5,15 +5,14 @@ const { errors } = require('celebrate');
 const router = require('./routes/index');
 const errorHandler = require('./middlewares/errorHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
-const { PORT = 3000 } = process.env;
+const { PORT, MONGO_ADRESS } = require('./utils/config');
 
 const app = express();
 app.use(requestLogger); // подключаем логгер запросов
 app.use(express.json());
 app.use(cookieParser());
 
-mongoose.connect('mongodb://127.0.0.1/mestodb');
+mongoose.connect(MONGO_ADRESS);
 
 app.use('/', router);
 
